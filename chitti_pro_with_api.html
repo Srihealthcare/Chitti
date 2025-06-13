@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chitti Pro – GPT-Enabled</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f4; }
+    #chatbox { background: white; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .message { margin: 10px 0; }
+    .user { text-align: right; color: #007BFF; }
+    .bot { text-align: left; color: #28A745; }
+    #inputBox { width: 80%; padding: 10px; }
+    #sendBtn { padding: 10px 20px; }
+  </style>
+</head>
+<body>
+  <h2 align="center">🤖 Chitti Pro – GPT Connected Assistant</h2>
+  <div id="chatbox">
+    <div class="message bot">Namaste! I'm Chitti Pro from Sri Health Care. Ask me about diabetes, BP, thyroid, fevers, and more.</div>
+  </div>
+  <div style="text-align:center;">
+    <input type="text" id="inputBox" placeholder="Type your question..." />
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <script>
+    const chatbox = document.getElementById('chatbox');
+    const inputBox = document.getElementById('inputBox');
+    const sendBtn = document.getElementById('sendBtn');
+
+    const apiKey = "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";
+
+    async function getGPTReply(message) {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4",
+          messages: [{ role: "user", content: message }]
+        })
+      });
+      const data = await response.json();
+      return data.choices[0].message.content;
+    }
+
+    sendBtn.onclick = async () => {
+      const userMsg = inputBox.value.trim();
+      if (userMsg) {
+        const userDiv = document.createElement('div');
+        userDiv.className = 'message user';
+        userDiv.innerText = userMsg;
+        chatbox.appendChild(userDiv);
+
+        const botDiv = document.createElement('div');
+        botDiv.className = 'message bot';
+        botDiv.innerText = "Typing...";
+        chatbox.appendChild(botDiv);
+
+        inputBox.value = '';
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        try {
+          const reply = await getGPTReply(userMsg);
+          botDiv.innerText = reply + "\n\nPlease consult Dr. Vijayakumar Punnapu at Sri Health Care for confirmation.";
+        } catch (error) {
+          botDiv.innerText = "⚠️ Sorry, I couldn't fetch a response. Please check your internet or API key.";
+        }
+      }
+    };
+  </script>
+</body>
+</html>
