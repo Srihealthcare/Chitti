@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chitti Pro – Smart Clinic Assistant</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #e0f7fa, #e1bee7);
+      color: #333;
+    }
+
+    #chatbox {
+      background-color: #ffffffcc;
+      backdrop-filter: blur(5px);
+      padding: 25px;
+      max-width: 700px;
+      margin: auto;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .message {
+      margin: 12px 0;
+      padding: 10px 14px;
+      border-radius: 12px;
+      line-height: 1.5;
+      max-width: 90%;
+      display: inline-block;
+    }
+
+    .user {
+      background-color: #d1c4e9;
+      color: #4a148c;
+      float: right;
+      clear: both;
+    }
+
+    .bot {
+      background-color: #b2dfdb;
+      color: #004d40;
+      float: left;
+      clear: both;
+    }
+
+    #inputArea {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    #inputBox {
+      width: 70%;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #7e57c2;
+      border-radius: 8px;
+    }
+
+    #sendBtn {
+      padding: 12px 24px;
+      font-size: 16px;
+      margin-left: 8px;
+      border: none;
+      background-color: #7e57c2;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #sendBtn:hover {
+      background-color: #5e35b1;
+    }
+
+    h2 {
+      text-align: center;
+      color: #4a148c;
+      margin-bottom: 20px;
+    }
+
+    .clear { clear: both; }
+  </style>
+</head>
+<body>
+  <h2>🤖 Chitti Pro – Your Smart Clinic Assistant</h2>
+  <div id="chatbox">
+    <div class="message bot">Namaste! I'm Chitti Pro. Ask me about diabetes, BP, thyroid, fevers, and more.</div>
+    <div class="clear"></div>
+  </div>
+  <div id="inputArea">
+    <input type="text" id="inputBox" placeholder="Type your question here..." />
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <script>
+    const chatbox = document.getElementById('chatbox');
+    const inputBox = document.getElementById('inputBox');
+    const sendBtn = document.getElementById('sendBtn');
+
+    async function getReply(message) {
+      try {
+        const response = await fetch("https://chittipro-gpt-handler.netlify.app/.netlify/functions/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: message })
+        });
+        const data = await response.json();
+        return data.reply;
+      } catch (err) {
+        return "⚠️ Unable to connect to Chitti’s brain right now. Please try again later.";
+      }
+    }
+
+    sendBtn.onclick = async () => {
+      const userMessage = inputBox.value.trim();
+      if (userMessage) {
+        const userDiv = document.createElement('div');
+        userDiv.className = 'message user';
+        userDiv.innerText = userMessage;
+        chatbox.appendChild(userDiv);
+
+        const botDiv = document.createElement('div');
+        botDiv.className = 'message bot';
+        botDiv.innerText = "Typing...";
+        chatbox.appendChild(botDiv);
+
+        const clearDiv = document.createElement('div');
+        clearDiv.className = 'clear';
+        chatbox.appendChild(clearDiv);
+
+        inputBox.value = '';
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        const reply = await getReply(userMessage);
+        botDiv.innerText = reply + "\n\n👨‍⚕️ Please consult Dr. Vijayakumar Punnapu at Sri Health Care for confirmation.";
+      }
+    };
+  </script>
+</body>
+</html>
